@@ -485,6 +485,7 @@ func handleUidPostings(ctx context.Context, args funcArgs, opts posting.ListOpti
 		var key []byte
 		switch srcFn.fnType {
 		case NotAFunction, CompareScalarFn, HasFn, UidInFn:
+			glog.V(2).Infof("Checking %+v for uid: %d\n", srcFn, q.UidList.Uids[i])
 			if q.Reverse {
 				key = x.ReverseKey(attr, q.UidList.Uids[i])
 			} else {
@@ -507,6 +508,9 @@ func handleUidPostings(ctx context.Context, args funcArgs, opts posting.ListOpti
 		// get filtered uids and facets.
 		var filteredRes []*result
 
+		// TODO: This is only applicable if we have a facetsTree. If that is
+		// nil, we can skip this whole step, which copies facets. But, looks
+		// like the CopyFacets is doing something potentially useful here.
 		var perr error
 		filteredRes = make([]*result, 0)
 		err = pl.Postings(opts, func(p *pb.Posting) bool {
@@ -557,12 +561,12 @@ func handleUidPostings(ctx context.Context, args funcArgs, opts posting.ListOpti
 				out.UidMatrix = append(out.UidMatrix, tlist)
 			}
 		case srcFn.fnType == HasFn:
+			glog.V(2).Infof("Calling HasFn to check length of pl\n")
 			len := pl.Length(args.q.ReadTs, 0)
 			if len == -1 {
 				return posting.ErrTsTooOld
 			}
-			count := int64(len)
-			if EvalCompare("gt", count, 0) {
+			if len > 0 {
 				tlist := &pb.List{[]uint64{q.UidList.Uids[i]}}
 				out.UidMatrix = append(out.UidMatrix, tlist)
 			}
@@ -618,6 +622,9 @@ func processTask(ctx context.Context, q *pb.Query, gid uint32) (*pb.Result, erro
 }
 
 func helpProcessTask(ctx context.Context, q *pb.Query, gid uint32) (*pb.Result, error) {
+	if glog.V(2) {
+		glog.Infof("helpProcessTask. query: %+v\n", q)
+	}
 	out := new(pb.Result)
 	attr := q.Attr
 
@@ -1616,11 +1623,11 @@ func (cp *countParams) evaluate(out *pb.Result) error {
 // transactions and in-progress transactions. It also accounts for transaction
 // start ts.
 func handleHasFunction(ctx context.Context, q *pb.Query, out *pb.Result) error {
-	txn := pstore.NewTransactionAt(q.ReadTs, false)
-	defer txn.Discard()
-
 	initKey := x.ParsedKey{
 		Attr: q.Attr,
+	}
+	if glog.V(2) {
+		glog.Infof("handleHasFunction query: %+q\n", q)
 	}
 	startKey := x.DataKey(q.Attr, q.AfterUid+1)
 	prefix := initKey.DataPrefix()
@@ -1658,6 +1665,9 @@ func handleHasFunction(ctx context.Context, q *pb.Query, out *pb.Result) error {
 	itOpt := badger.DefaultIteratorOptions
 	itOpt.PrefetchValues = false
 	itOpt.AllVersions = true
+	txn := pstore.NewTransactionAt(q.ReadTs, false)
+	defer txn.Discard()
+
 	it := txn.NewIterator(itOpt)
 	defer it.Close()
 

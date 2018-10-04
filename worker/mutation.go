@@ -316,6 +316,13 @@ func ValidateAndConvert(edge *pb.DirectedEdge, su *pb.SchemaUpdate) error {
 		return nil
 	}
 	// <s> <p> <o> Del on non list scalar type.
+	// <uid> <age> "11"^^<xs:int> // This is storage type.
+	// If we don't have schema for age, then age schema -> int.
+	// But, then everything in age should be converted to int.
+	// <uid> <age> "11" // Default.
+	// { "uid": "0xff", "age": "11" } // 11 is a string here.
+	// The schema for pwd should already be set, before the first mutation.
+	// <uid> <pwd> "dfd"^^<password> //
 	if edge.ValueId == 0 && !bytes.Equal(edge.Value, []byte(x.Star)) &&
 		edge.Op == pb.DirectedEdge_DEL {
 		if !su.GetList() {
@@ -355,6 +362,8 @@ func ValidateAndConvert(edge *pb.DirectedEdge, su *pb.SchemaUpdate) error {
 	}
 
 	// if storage type was specified skip
+	// Schema type > Storage Type > default
+	// If there's storage type, then don't convert!
 	if storageType != types.DefaultID {
 		return nil
 	}

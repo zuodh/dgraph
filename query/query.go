@@ -29,6 +29,7 @@ import (
 	"github.com/dgraph-io/dgraph/types/facets"
 	"github.com/dgraph-io/dgraph/worker"
 	"github.com/dgraph-io/dgraph/x"
+	"github.com/golang/glog"
 )
 
 const (
@@ -1891,6 +1892,7 @@ func ProcessGraph(ctx context.Context, sg, parent *SubGraph, rch chan error) {
 				rch <- err
 				return
 			}
+			glog.V(2).Infof("sg: %+v --> taskquery: %+v\n", sg, taskQuery)
 			result, err := worker.ProcessTaskOverNetwork(ctx, taskQuery)
 			if err != nil {
 				if tr, ok := trace.FromContext(ctx); ok {
