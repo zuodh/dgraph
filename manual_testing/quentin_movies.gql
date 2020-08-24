@@ -1,0 +1,8 @@
+{
+  q(func: allofterms(name@en, "Quentin Tarantino")) {
+    name@en
+    director.film {
+      name@en
+    }
+  }
+}
