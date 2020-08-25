@@ -34,7 +34,7 @@ query=$(<quentin_movies.gql)
 
 echo "\n Movies of Quentin Tarantino"
 
-response=$(curl -i -H 'Content-Type: application/graphql+-' -X POST localhost:8080/query $query)
+response=$(curl -i -H 'Content-Type: application/graphql+-' -X POST localhost:8080/query -d $query)
 echo $response
 if [[ $response == *"Django Unchained" ]]; then
     echo "Okay response"
