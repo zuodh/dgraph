@@ -112,7 +112,7 @@ func (w *OldDiskStorage) fetchMaxVersion() {
 	}
 	if err == badger.ErrKeyNotFound {
 		// We don't have the special key so get it using the MaxVersion API.
-		version, err := w.db.MaxVersion()
+		version := w.db.MaxVersion()
 		x.Check(err)
 
 		w.commitTs = version + 1

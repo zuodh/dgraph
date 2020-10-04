@@ -65,12 +65,8 @@ func InitServerState() {
 
 func setBadgerOptions(opt badger.Options) badger.Options {
 	opt = opt.WithSyncWrites(false).
-		WithTruncate(true).
 		WithLogger(&x.ToGlog{}).
 		WithEncryptionKey(x.WorkerConfig.EncryptionKey)
-
-	// Do not load bloom filters on DB open.
-	opt.LoadBloomsOnOpen = false
 
 	// Disable conflict detection in badger. Alpha runs in managed mode and
 	// perform its own conflict detection so we don't need badger's conflict
@@ -78,9 +74,6 @@ func setBadgerOptions(opt badger.Options) badger.Options {
 	// saved by disabling it.
 	opt.DetectConflicts = false
 
-	// Settings for the data directory.
-	badgerTables := Config.BadgerTables
-	badgerVlog := Config.BadgerVlog
 	glog.Infof("Setting Posting Dir Compression Level: %d", Config.PostingDirCompressionLevel)
 	// Default value of postingDirCompressionLevel is 3 so compression will always
 	// be enabled, unless it is explicitly disabled by setting the value to 0.
@@ -90,27 +83,7 @@ func setBadgerOptions(opt badger.Options) badger.Options {
 		opt.ZSTDCompressionLevel = Config.PostingDirCompressionLevel
 	}
 
-	glog.Infof("Setting Badger table load option: %s", Config.BadgerTables)
-	switch badgerTables {
-	case "mmap":
-		opt.TableLoadingMode = options.MemoryMap
-	case "ram":
-		opt.TableLoadingMode = options.LoadToRAM
-	case "disk":
-		opt.TableLoadingMode = options.FileIO
-	default:
-		glog.Fatalf("Invalid Badger Tables options")
-	}
-
 	glog.Infof("Setting Badger value log load option: %s", Config.BadgerVlog)
-	switch badgerVlog {
-	case "mmap":
-		opt.ValueLogLoadingMode = options.MemoryMap
-	case "disk":
-		opt.ValueLogLoadingMode = options.FileIO
-	default:
-		x.Fatalf("Invalid Badger Value log options")
-	}
 	return opt
 }
 
