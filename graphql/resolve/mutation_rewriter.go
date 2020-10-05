@@ -1155,7 +1155,7 @@ func rewriteObject(
 	}
 
 	if xid != nil && !atTopLevel {
-		if deepXID <= 2 { // elements in firstPass or not
+		if deepXID < 2 { // elements in firstPass or not
 			// duplicate query in elements >= 2, as the pair firstPass element would already have
 			// the same query.
 			frag.queries = []*gql.GraphQuery{

@@ -286,6 +286,93 @@
       cond: "@if(eq(len(PostSecret4), 1) AND eq(len(PostSecret7), 1) AND eq(len(PostSecret10), 1) AND eq(len(PostSecret13), 1) AND eq(len(PostSecret16), 1) AND eq(len(PostSecret19), 1) AND eq(len(PostSecret22), 1) AND eq(len(PostSecret25), 1))"
 
 -
+  name: "Add deep mutation with xids"
+  gqlmutation: |
+    mutation addCountry($input: AddCountryInput!) {
+      addCountry(input: [$input]) {
+        country {
+          name
+          states {
+            code
+            name
+          }
+        }
+      }
+    }
+  gqlvariables: |
+    {
+      "input" : {
+        "name" : "c1",
+        "states" : [{
+          "code" : "s1",
+          "name" : "s1",
+          "region" : {
+            "id": "r1",
+            "name": "r1",
+            "district":{
+              "code": "d1",
+              "name": "d1"
+            }
+          }
+        }]
+      }
+    }
+  explanation: "A uid and type should get injected and all data transformed to
+    underlying Dgraph edge names"
+  dgquery: |-
+    query {
+      State3 as State3(func: eq(State.code, "s1")) @filter(type(State)) {
+        uid
+      }
+      Region6 as Region6(func: eq(Region.id, "r1")) @filter(type(Region)) {
+        uid
+      }
+      District8 as District8(func: eq(District.code, "d1")) @filter(type(District)) {
+        uid
+      }
+    }
+  dgquerysec: |-
+    
+  dgmutations:  
+    - setjson: |
+        {
+          "State.code": "s1",
+          "State.name": "s1",
+          "State.region": {
+            "uid": "uid(Region6)"
+          }
+          "dgraph.type": [
+            "State"
+            ],
+          "uid": "_:State3"
+        }
+      cond: "@if(eq(len(State3), 0) AND eq(len(Region6),1))"
+    - setjson: |
+        {
+          "Region.code": "r1",
+          "dgraph.type": [
+            "Region"
+            ],
+          "uid": "_:Region6"
+        }
+      cond: "@if(eq(len(Region6), 0))"
+    - setjson: |
+        {
+          "District.code": "d1",
+          "Distict.name": "d1",
+          "dgraph.type": [
+            "District"
+            ],
+          "uid": "_:District8"
+        }
+      cond: "@if(eq(len(District8), 0))"
+  dgmutationssec:
+    - setjson: |
+        {
+
+        }
+      cond: 
+-
   name: "Add mutation for predicates with special characters having @dgraph directive."
   gqlmutation: |
     mutation {
