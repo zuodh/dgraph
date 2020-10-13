@@ -35,6 +35,8 @@ import (
 	"github.com/dgraph-io/dgo/v200"
 	"github.com/dgraph-io/dgo/v200/protos/api"
 	"github.com/dgraph-io/dgraph/dgraph/cmd/zero"
+	"github.com/dgraph-io/dgraph/fb"
+	"github.com/dgraph-io/dgraph/fbx"
 	"github.com/dgraph-io/dgraph/gql"
 	"github.com/dgraph-io/dgraph/protos/pb"
 	"github.com/dgraph-io/dgraph/tok"
@@ -208,44 +210,45 @@ func getTypeVal(val *api.Value) (types.Val, error) {
 	return p1, nil
 }
 
-func createUidEdge(nq *api.NQuad, sid, oid uint64) *pb.DirectedEdge {
-	return &pb.DirectedEdge{
-		Entity:    sid,
-		Attr:      nq.Predicate,
-		Label:     nq.Label,
-		Lang:      nq.Lang,
-		Facets:    nq.Facets,
-		ValueId:   oid,
-		ValueType: pb.Posting_UID,
-	}
+func createUidEdge(nq *api.NQuad, sid, oid uint64) *fb.DirectedEdge {
+	return fbx.NewDirectedEdge().
+		SetEntity(sid).
+		SetAttr(nq.Predicate).
+		SetLabel(nq.Label).
+		SetLang(nq.Lang).
+		ExtendFacets(nq.Facets).
+		SetValueID(oid).
+		SetValueType(pb.Posting_UID).
+		Build()
 }
 
-func createValueEdge(nq *api.NQuad, sid uint64) (*pb.DirectedEdge, error) {
-	p := &pb.DirectedEdge{
-		Entity: sid,
-		Attr:   nq.Predicate,
-		Label:  nq.Label,
-		Lang:   nq.Lang,
-		Facets: nq.Facets,
-	}
+func createValueEdge(nq *api.NQuad, sid uint64) (*fb.DirectedEdge, error) {
+	de := fbx.NewDirectedEdge().
+		SetEntity(sid).
+		SetAttr(nq.Predicate).
+		SetLabel(nq.Label).
+		SetLang(nq.Lang).
+		ExtendFacets(nq.Facets)
+
 	val, err := getTypeVal(nq.ObjectValue)
 	if err != nil {
-		return p, err
+		return de.Build(), err
 	}
 
-	p.Value = val.Value.([]byte)
-	p.ValueType = val.Tid.Enum()
-	return p, nil
+	de.
+		SetValue(val.Value.([]byte)).
+		SetValueType(val.Tid.Enum())
+	return de.Build(), nil
 }
 
-func fingerprintEdge(t *pb.DirectedEdge, pred *predicate) uint64 {
+func fingerprintEdge(t *fb.DirectedEdge, pred *predicate) uint64 {
 	var id uint64 = math.MaxUint64
 
 	// Value with a lang type.
-	if len(t.Lang) > 0 {
-		id = farm.Fingerprint64([]byte(t.Lang))
+	if len(t.Lang()) > 0 {
+		id = farm.Fingerprint64(t.Lang())
 	} else if pred.List {
-		id = farm.Fingerprint64(t.Value)
+		id = farm.Fingerprint64(t.ValueBytes())
 	}
 	return id
 }
@@ -268,7 +271,7 @@ func (l *loader) conflictKeysForNQuad(nq *api.NQuad) ([]uint64, error) {
 	}
 
 	var oid uint64
-	var de *pb.DirectedEdge
+	var de *fb.DirectedEdge
 
 	if nq.ObjectValue == nil {
 		oid, _ = strconv.ParseUint(nq.ObjectId, 0, 64)
@@ -312,8 +315,8 @@ func (l *loader) conflictKeysForNQuad(nq *api.NQuad) ([]uint64, error) {
 		}
 
 		storageVal := types.Val{
-			Tid:   types.TypeID(de.GetValueType()),
-			Value: de.GetValue(),
+			Tid:   types.TypeID(de.ValueType()),
+			Value: de.ValueBytes(),
 		}
 
 		schemaVal, err := types.Convert(storageVal, types.TypeID(pred.ValueType))
