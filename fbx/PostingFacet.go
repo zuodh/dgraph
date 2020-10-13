@@ -43,7 +43,7 @@ func (p *postingFacet) SetAlias(alias string) *postingFacet {
 	return p
 }
 
-func (p *postingFacet) BuildFacet() *Posting {
+func (p *postingFacet) EndFacet() *Posting {
 	offset := p.f.buildOffset()
 	p.p.facets = append(p.p.facets, offset)
 	return p.p

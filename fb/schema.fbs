@@ -11,20 +11,6 @@ enum PostingType : int32 {
 	VALUE_LANG,
 }
 
-enum PostingValueType : int32 {
-    DEFAULT,
-    BINARY,
-    INT,
-    FLOAT,
-    BOOL,
-    DATETIME,
-    GEO,
-    UID,
-    PASSWORD,
-    STRING,
-    OBJECT,
-}
-
 table Facet {
 	key:string;
 	value:[ubyte];
@@ -37,7 +23,7 @@ table DirectedEdge {
     entity:uint64;
 	attr:string;
 	value:[ubyte];
-	value_type:PostingValueType;
+	value_type:int32;
 	value_id:uint64;
 	label:string;
 	lang:string;
@@ -49,7 +35,7 @@ table DirectedEdge {
 table Posting {
 	uid:uint64;
 	value:[ubyte];
-	value_type:PostingValueType;
+	value_type:int32;
 	lang_tag:[ubyte];
 	label:string;
 	facets:[Facet];

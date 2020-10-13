@@ -1,7 +1,9 @@
 package fbx
 
 import (
+	"github.com/dgraph-io/dgo/v200/protos/api"
 	"github.com/dgraph-io/dgraph/fb"
+	"github.com/dgraph-io/dgraph/protos/pb"
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
@@ -11,7 +13,7 @@ type DirectedEdge struct {
 	entity       uint64
 	attr         flatbuffers.UOffsetT
 	value        flatbuffers.UOffsetT
-	valueType    fb.PostingValueType
+	valueType    int32
 	valueID      uint64
 	label        flatbuffers.UOffsetT
 	lang         flatbuffers.UOffsetT
@@ -41,8 +43,8 @@ func (de *DirectedEdge) SetValue(value []byte) *DirectedEdge {
 	return de
 }
 
-func (de *DirectedEdge) SetValueType(valueType fb.PostingValueType) *DirectedEdge {
-	de.valueType = valueType
+func (de *DirectedEdge) SetValueType(valueType pb.Posting_ValType) *DirectedEdge {
+	de.valueType = int32(valueType)
 	return de
 }
 
@@ -66,7 +68,14 @@ func (de *DirectedEdge) SetOp(op fb.DirectedEdgeOp) *DirectedEdge {
 	return de
 }
 
-func (de *DirectedEdge) AppendFacet() *directedEdgeFacet {
+func (de *DirectedEdge) ExtendFacets(facets []*api.Facet) *DirectedEdge {
+	for _, facet := range facets {
+		de.StartFacet().From(facet).EndFacet()
+	}
+	return de
+}
+
+func (de *DirectedEdge) StartFacet() *directedEdgeFacet {
 	return newDirectedEdgeFacet(de)
 }
 

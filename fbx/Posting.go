@@ -2,6 +2,7 @@ package fbx
 
 import (
 	"github.com/dgraph-io/dgraph/fb"
+	"github.com/dgraph-io/dgraph/protos/pb"
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
@@ -10,7 +11,7 @@ type Posting struct {
 
 	uid       uint64
 	value     flatbuffers.UOffsetT
-	valueType fb.PostingValueType
+	valueType int32
 	langTag   flatbuffers.UOffsetT
 	label     flatbuffers.UOffsetT
 	facets    []flatbuffers.UOffsetT
@@ -35,8 +36,8 @@ func (p *Posting) SetValue(value []byte) *Posting {
 	return p
 }
 
-func (p *Posting) SetValueType(valueType fb.PostingValueType) *Posting {
-	p.valueType = valueType
+func (p *Posting) SetValueType(valueType pb.Posting_ValType) *Posting {
+	p.valueType = int32(valueType)
 	return p
 }
 
@@ -50,7 +51,7 @@ func (p *Posting) SetLabel(label string) *Posting {
 	return p
 }
 
-func (p *Posting) AppendFacet() *postingFacet {
+func (p *Posting) StartFacet() *postingFacet {
 	return newPostingFacet(p)
 }
 

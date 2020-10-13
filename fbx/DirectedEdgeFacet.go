@@ -18,6 +18,11 @@ func newDirectedEdgeFacet(de *DirectedEdge) *directedEdgeFacet {
 	}
 }
 
+func (f *directedEdgeFacet) From(facet *api.Facet) *directedEdgeFacet {
+	f.f.From(facet)
+	return f
+}
+
 func (f *directedEdgeFacet) SetKey(key string) *directedEdgeFacet {
 	f.f.SetKey(key)
 	return f
@@ -43,7 +48,7 @@ func (f *directedEdgeFacet) SetAlias(alias string) *directedEdgeFacet {
 	return f
 }
 
-func (f *directedEdgeFacet) BuildFacet() *DirectedEdge {
+func (f *directedEdgeFacet) EndFacet() *DirectedEdge {
 	offset := f.f.buildOffset()
 	f.de.facets = append(f.de.facets, offset)
 	return f.de

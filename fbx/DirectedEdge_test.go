@@ -6,6 +6,7 @@ import (
 
 	"github.com/dgraph-io/dgraph/fb"
 	"github.com/dgraph-io/dgraph/fbx"
+	"github.com/dgraph-io/dgraph/protos/pb"
 	"github.com/stretchr/testify/require"
 )
 
@@ -13,7 +14,7 @@ func TestDirectedEdge(t *testing.T) {
 	entity := uint64(1)
 	attr := "attr"
 	value := []byte("value")
-	valueType := fb.PostingValueTypeBINARY
+	valueType := pb.Posting_BINARY
 	valueID := uint64(2)
 	label := "label"
 	lang := "lang"
@@ -39,9 +40,9 @@ func TestDirectedEdge(t *testing.T) {
 		SetAllowedPreds(allowedPreds)
 
 	for _, facet := range facets {
-		builder.AppendFacet().
+		builder.StartFacet().
 			SetKey(fbx.BytesToString(facet.Key())).
-			BuildFacet()
+			EndFacet()
 	}
 
 	de := builder.Build()
@@ -49,7 +50,7 @@ func TestDirectedEdge(t *testing.T) {
 	require.Equal(t, de.Entity(), entity)
 	require.Equal(t, fbx.BytesToString(de.Attr()), attr)
 	require.Equal(t, de.ValueBytes(), value)
-	require.Equal(t, de.ValueType(), valueType)
+	require.Equal(t, pb.Posting_ValType(de.ValueType()), valueType)
 	require.Equal(t, de.ValueId(), valueID)
 	require.Equal(t, fbx.BytesToString(de.Label()), label)
 	require.Equal(t, fbx.BytesToString(de.Lang()), lang)

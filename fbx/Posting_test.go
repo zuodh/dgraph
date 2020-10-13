@@ -6,13 +6,14 @@ import (
 
 	"github.com/dgraph-io/dgraph/fb"
 	"github.com/dgraph-io/dgraph/fbx"
+	"github.com/dgraph-io/dgraph/protos/pb"
 	"github.com/stretchr/testify/require"
 )
 
 func TestPosting(t *testing.T) {
 	uid := uint64(1)
 	value := []byte("value")
-	valueType := fb.PostingValueTypeBINARY
+	valueType := pb.Posting_BINARY
 	langTag := []byte("langTag")
 	label := "label"
 	facets := make([]*fb.Facet, 0)
@@ -37,15 +38,15 @@ func TestPosting(t *testing.T) {
 		SetCommitTs(commitTs)
 
 	for _, facet := range facets {
-		builder.AppendFacet().
+		builder.StartFacet().
 			SetKey(fbx.BytesToString(facet.Key())).
-			BuildFacet()
+			EndFacet()
 	}
 
 	p := builder.Build()
 	require.Equal(t, p.Uid(), uid)
 	require.Equal(t, p.ValueBytes(), value)
-	require.Equal(t, p.ValueType(), valueType)
+	require.Equal(t, pb.Posting_ValType(p.ValueType()), valueType)
 	require.Equal(t, p.LangTagBytes(), langTag)
 	require.Equal(t, fbx.BytesToString(p.Label()), label)
 	require.Equal(t, p.FacetsLength(), len(facets))

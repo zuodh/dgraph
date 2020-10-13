@@ -22,7 +22,7 @@ func NewFacet() *Facet {
 	}
 }
 
-func (f *Facet) FromStruct(facet *api.Facet) *Facet {
+func (f *Facet) From(facet *api.Facet) *Facet {
 	return f.
 		SetKey(facet.Key).
 		SetValue(facet.Value).

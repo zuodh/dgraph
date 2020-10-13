@@ -80,16 +80,16 @@ func (rcv *DirectedEdge) MutateValue(j int, n byte) bool {
 	return false
 }
 
-func (rcv *DirectedEdge) ValueType() PostingValueType {
+func (rcv *DirectedEdge) ValueType() int32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
-		return PostingValueType(rcv._tab.GetInt32(o + rcv._tab.Pos))
+		return rcv._tab.GetInt32(o + rcv._tab.Pos)
 	}
 	return 0
 }
 
-func (rcv *DirectedEdge) MutateValueType(n PostingValueType) bool {
-	return rcv._tab.MutateInt32Slot(10, int32(n))
+func (rcv *DirectedEdge) MutateValueType(n int32) bool {
+	return rcv._tab.MutateInt32Slot(10, n)
 }
 
 func (rcv *DirectedEdge) ValueId() uint64 {
@@ -184,8 +184,8 @@ func DirectedEdgeAddValue(builder *flatbuffers.Builder, value flatbuffers.UOffse
 func DirectedEdgeStartValueVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(1, numElems, 1)
 }
-func DirectedEdgeAddValueType(builder *flatbuffers.Builder, valueType PostingValueType) {
-	builder.PrependInt32Slot(3, int32(valueType), 0)
+func DirectedEdgeAddValueType(builder *flatbuffers.Builder, valueType int32) {
+	builder.PrependInt32Slot(3, valueType, 0)
 }
 func DirectedEdgeAddValueId(builder *flatbuffers.Builder, valueId uint64) {
 	builder.PrependUint64Slot(4, valueId, 0)
