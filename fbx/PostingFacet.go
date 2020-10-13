@@ -1,6 +1,8 @@
 package fbx
 
-import "github.com/dgraph-io/dgraph/fb"
+import (
+	"github.com/dgraph-io/dgo/v200/protos/api"
+)
 
 type postingFacet struct {
 	p *Posting
@@ -26,7 +28,7 @@ func (p *postingFacet) SetValue(value []byte) *postingFacet {
 	return p
 }
 
-func (p *postingFacet) SetValueType(valueType fb.FacetValueType) *postingFacet {
+func (p *postingFacet) SetValueType(valueType api.Facet_ValType) *postingFacet {
 	p.f.SetValueType(valueType)
 	return p
 }

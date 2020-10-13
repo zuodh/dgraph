@@ -3,7 +3,7 @@ package fbx_test
 import (
 	"testing"
 
-	"github.com/dgraph-io/dgraph/fb"
+	"github.com/dgraph-io/dgo/v200/protos/api"
 	"github.com/dgraph-io/dgraph/fbx"
 	"github.com/stretchr/testify/require"
 )
@@ -11,7 +11,7 @@ import (
 func TestFacet(t *testing.T) {
 	key := "key"
 	value := []byte("value")
-	valueType := fb.FacetValueTypeBOOL
+	valueType := api.Facet_STRING
 	tokens := []string{"some", "tokens"}
 	alias := "alias"
 

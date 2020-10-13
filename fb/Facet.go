@@ -68,16 +68,16 @@ func (rcv *Facet) MutateValue(j int, n byte) bool {
 	return false
 }
 
-func (rcv *Facet) ValueType() FacetValueType {
+func (rcv *Facet) ValueType() int32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
-		return FacetValueType(rcv._tab.GetInt32(o + rcv._tab.Pos))
+		return rcv._tab.GetInt32(o + rcv._tab.Pos)
 	}
 	return 0
 }
 
-func (rcv *Facet) MutateValueType(n FacetValueType) bool {
-	return rcv._tab.MutateInt32Slot(8, int32(n))
+func (rcv *Facet) MutateValueType(n int32) bool {
+	return rcv._tab.MutateInt32Slot(8, n)
 }
 
 func (rcv *Facet) Tokens(j int) []byte {
@@ -117,8 +117,8 @@ func FacetAddValue(builder *flatbuffers.Builder, value flatbuffers.UOffsetT) {
 func FacetStartValueVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(1, numElems, 1)
 }
-func FacetAddValueType(builder *flatbuffers.Builder, valueType FacetValueType) {
-	builder.PrependInt32Slot(2, int32(valueType), 0)
+func FacetAddValueType(builder *flatbuffers.Builder, valueType int32) {
+	builder.PrependInt32Slot(2, valueType, 0)
 }
 func FacetAddTokens(builder *flatbuffers.Builder, tokens flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(tokens), 0)

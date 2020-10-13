@@ -1,6 +1,7 @@
 package fbx
 
 import (
+	"github.com/dgraph-io/dgo/v200/protos/api"
 	"github.com/dgraph-io/dgraph/fb"
 	flatbuffers "github.com/google/flatbuffers/go"
 )
@@ -10,7 +11,7 @@ type Facet struct {
 
 	key       flatbuffers.UOffsetT
 	value     flatbuffers.UOffsetT
-	valueType fb.FacetValueType
+	valueType int32
 	tokens    flatbuffers.UOffsetT
 	alias     flatbuffers.UOffsetT
 }
@@ -19,6 +20,15 @@ func NewFacet() *Facet {
 	return &Facet{
 		builder: flatbuffers.NewBuilder(bufSize),
 	}
+}
+
+func (f *Facet) FromStruct(facet *api.Facet) *Facet {
+	return f.
+		SetKey(facet.Key).
+		SetValue(facet.Value).
+		SetValueType(facet.ValType).
+		SetTokens(facet.Tokens).
+		SetAlias(facet.Alias)
 }
 
 func (f *Facet) SetKey(key string) *Facet {
@@ -31,8 +41,8 @@ func (f *Facet) SetValue(value []byte) *Facet {
 	return f
 }
 
-func (f *Facet) SetValueType(valueType fb.FacetValueType) *Facet {
-	f.valueType = valueType
+func (f *Facet) SetValueType(valueType api.Facet_ValType) *Facet {
+	f.valueType = int32(valueType)
 	return f
 }
 

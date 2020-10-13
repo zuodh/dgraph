@@ -1,7 +1,7 @@
 package fbx
 
 import (
-	"github.com/dgraph-io/dgraph/fb"
+	"github.com/dgraph-io/dgo/v200/protos/api"
 )
 
 type directedEdgeFacet struct {
@@ -28,7 +28,7 @@ func (f *directedEdgeFacet) SetValue(value []byte) *directedEdgeFacet {
 	return f
 }
 
-func (f *directedEdgeFacet) SetValueType(valueType fb.FacetValueType) *directedEdgeFacet {
+func (f *directedEdgeFacet) SetValueType(valueType api.Facet_ValType) *directedEdgeFacet {
 	f.f.SetValueType(valueType)
 	return f
 }

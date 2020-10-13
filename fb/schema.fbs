@@ -1,13 +1,5 @@
 namespace fb;
 
-enum FacetValueType : int32 {
-	STRING,
-	INT,
-	FLOAT,
-	BOOL,
-	DATETIME,
-}
-
 enum DirectedEdgeOp : int32 {
     SET,
     DEL,
@@ -36,7 +28,7 @@ enum PostingValueType : int32 {
 table Facet {
 	key:string;
 	value:[ubyte];
-	value_type:FacetValueType;
+	value_type:int32;
 	tokens:[string];
 	alias:string;
 }
