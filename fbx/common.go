@@ -1,4 +1,4 @@
-package fbs
+package fbx
 
 import (
 	"unsafe"

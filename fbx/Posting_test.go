@@ -1,15 +1,15 @@
-package fbs_test
+package fbx_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/dgraph-io/dgraph/fb"
-	"github.com/dgraph-io/dgraph/fbs"
+	"github.com/dgraph-io/dgraph/fbx"
 	"github.com/stretchr/testify/require"
 )
 
-func TestPostingBuilder(t *testing.T) {
+func TestPosting(t *testing.T) {
 	uid := uint64(1)
 	value := []byte("value")
 	valueType := fb.PostingValueTypeBINARY
@@ -17,7 +17,7 @@ func TestPostingBuilder(t *testing.T) {
 	label := "label"
 	facets := make([]*fb.Facet, 0)
 	for i := 0; i < 5; i++ {
-		facet := fbs.NewFacetBuilder().
+		facet := fbx.NewFacet().
 			SetKey(fmt.Sprintf("facet%d", i)).
 			Build()
 		facets = append(facets, facet)
@@ -26,7 +26,7 @@ func TestPostingBuilder(t *testing.T) {
 	startTs := uint64(2)
 	commitTs := uint64(3)
 
-	builder := fbs.NewPostingBuilder().
+	builder := fbx.NewPosting().
 		SetUid(uid).
 		SetValue(value).
 		SetValueType(valueType).
@@ -38,7 +38,7 @@ func TestPostingBuilder(t *testing.T) {
 
 	for _, facet := range facets {
 		builder.AppendFacet().
-			SetKey(fbs.BytesToString(facet.Key())).
+			SetKey(fbx.BytesToString(facet.Key())).
 			BuildFacet()
 	}
 
@@ -47,7 +47,7 @@ func TestPostingBuilder(t *testing.T) {
 	require.Equal(t, p.ValueBytes(), value)
 	require.Equal(t, p.ValueType(), valueType)
 	require.Equal(t, p.LangTagBytes(), langTag)
-	require.Equal(t, fbs.BytesToString(p.Label()), label)
+	require.Equal(t, fbx.BytesToString(p.Label()), label)
 	require.Equal(t, p.FacetsLength(), len(facets))
 	for i, expFacet := range facets {
 		var gotFacet fb.Facet

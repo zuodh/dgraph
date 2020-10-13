@@ -1,11 +1,11 @@
-package fbs
+package fbx
 
 import (
 	"github.com/dgraph-io/dgraph/fb"
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-type FacetBuilder struct {
+type Facet struct {
 	builder *flatbuffers.Builder
 
 	key       flatbuffers.UOffsetT
@@ -15,28 +15,28 @@ type FacetBuilder struct {
 	alias     flatbuffers.UOffsetT
 }
 
-func NewFacetBuilder() *FacetBuilder {
-	return &FacetBuilder{
+func NewFacet() *Facet {
+	return &Facet{
 		builder: flatbuffers.NewBuilder(bufSize),
 	}
 }
 
-func (f *FacetBuilder) SetKey(key string) *FacetBuilder {
+func (f *Facet) SetKey(key string) *Facet {
 	f.key = f.builder.CreateString(key)
 	return f
 }
 
-func (f *FacetBuilder) SetValue(value []byte) *FacetBuilder {
+func (f *Facet) SetValue(value []byte) *Facet {
 	f.value = f.builder.CreateByteVector(value)
 	return f
 }
 
-func (f *FacetBuilder) SetValueType(valueType fb.FacetValueType) *FacetBuilder {
+func (f *Facet) SetValueType(valueType fb.FacetValueType) *Facet {
 	f.valueType = valueType
 	return f
 }
 
-func (f *FacetBuilder) SetTokens(tokens []string) *FacetBuilder {
+func (f *Facet) SetTokens(tokens []string) *Facet {
 	offsets := make([]flatbuffers.UOffsetT, len(tokens))
 	for i, token := range tokens {
 		offsets[i] = f.builder.CreateString(token)
@@ -51,12 +51,12 @@ func (f *FacetBuilder) SetTokens(tokens []string) *FacetBuilder {
 	return f
 }
 
-func (f *FacetBuilder) SetAlias(alias string) *FacetBuilder {
+func (f *Facet) SetAlias(alias string) *Facet {
 	f.alias = f.builder.CreateString(alias)
 	return f
 }
 
-func (f *FacetBuilder) Build() *fb.Facet {
+func (f *Facet) Build() *fb.Facet {
 	facet := f.buildOffset()
 	f.builder.Finish(facet)
 
@@ -64,7 +64,7 @@ func (f *FacetBuilder) Build() *fb.Facet {
 	return fb.GetRootAsFacet(buf, 0)
 }
 
-func (f *FacetBuilder) buildOffset() flatbuffers.UOffsetT {
+func (f *Facet) buildOffset() flatbuffers.UOffsetT {
 	fb.FacetStart(f.builder)
 	fb.FacetAddKey(f.builder, f.key)
 	fb.FacetAddValue(f.builder, f.value)

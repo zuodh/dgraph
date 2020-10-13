@@ -1,15 +1,15 @@
-package fbs_test
+package fbx_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/dgraph-io/dgraph/fb"
-	"github.com/dgraph-io/dgraph/fbs"
+	"github.com/dgraph-io/dgraph/fbx"
 	"github.com/stretchr/testify/require"
 )
 
-func TestDirectedEdgeBuilder(t *testing.T) {
+func TestDirectedEdge(t *testing.T) {
 	entity := uint64(1)
 	attr := "attr"
 	value := []byte("value")
@@ -20,14 +20,14 @@ func TestDirectedEdgeBuilder(t *testing.T) {
 	op := fb.DirectedEdgeOpDEL
 	facets := make([]*fb.Facet, 0)
 	for i := 0; i < 5; i++ {
-		facet := fbs.NewFacetBuilder().
+		facet := fbx.NewFacet().
 			SetKey(fmt.Sprintf("facet%d", i)).
 			Build()
 		facets = append(facets, facet)
 	}
 	allowedPreds := []string{"some", "allowed", "preds"}
 
-	builder := fbs.NewDirectedEdgeBuilder().
+	builder := fbx.NewDirectedEdge().
 		SetEntity(entity).
 		SetAttr(attr).
 		SetValue(value).
@@ -40,19 +40,19 @@ func TestDirectedEdgeBuilder(t *testing.T) {
 
 	for _, facet := range facets {
 		builder.AppendFacet().
-			SetKey(fbs.BytesToString(facet.Key())).
+			SetKey(fbx.BytesToString(facet.Key())).
 			BuildFacet()
 	}
 
 	de := builder.Build()
 
 	require.Equal(t, de.Entity(), entity)
-	require.Equal(t, fbs.BytesToString(de.Attr()), attr)
+	require.Equal(t, fbx.BytesToString(de.Attr()), attr)
 	require.Equal(t, de.ValueBytes(), value)
 	require.Equal(t, de.ValueType(), valueType)
 	require.Equal(t, de.ValueId(), valueID)
-	require.Equal(t, fbs.BytesToString(de.Label()), label)
-	require.Equal(t, fbs.BytesToString(de.Lang()), lang)
+	require.Equal(t, fbx.BytesToString(de.Label()), label)
+	require.Equal(t, fbx.BytesToString(de.Lang()), lang)
 	require.Equal(t, de.Op(), op)
 	require.Equal(t, de.FacetsLength(), len(facets))
 	for i, expFacet := range facets {
@@ -62,6 +62,6 @@ func TestDirectedEdgeBuilder(t *testing.T) {
 	}
 	require.Equal(t, de.AllowedPredsLength(), len(allowedPreds))
 	for i, pred := range allowedPreds {
-		require.Equal(t, fbs.BytesToString(de.AllowedPreds(i)), pred)
+		require.Equal(t, fbx.BytesToString(de.AllowedPreds(i)), pred)
 	}
 }

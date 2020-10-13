@@ -1,11 +1,11 @@
-package fbs
+package fbx
 
 import (
 	"github.com/dgraph-io/dgraph/fb"
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-type PostingBuilder struct {
+type Posting struct {
 	builder *flatbuffers.Builder
 
 	uid       uint64
@@ -19,57 +19,57 @@ type PostingBuilder struct {
 	commitTs  uint64
 }
 
-func NewPostingBuilder() *PostingBuilder {
-	return &PostingBuilder{
+func NewPosting() *Posting {
+	return &Posting{
 		builder: flatbuffers.NewBuilder(bufSize),
 	}
 }
 
-func (p *PostingBuilder) SetUid(uid uint64) *PostingBuilder {
+func (p *Posting) SetUid(uid uint64) *Posting {
 	p.uid = uid
 	return p
 }
 
-func (p *PostingBuilder) SetValue(value []byte) *PostingBuilder {
+func (p *Posting) SetValue(value []byte) *Posting {
 	p.value = p.builder.CreateByteVector(value)
 	return p
 }
 
-func (p *PostingBuilder) SetValueType(valueType fb.PostingValueType) *PostingBuilder {
+func (p *Posting) SetValueType(valueType fb.PostingValueType) *Posting {
 	p.valueType = valueType
 	return p
 }
 
-func (p *PostingBuilder) SetLangTag(langTag []byte) *PostingBuilder {
+func (p *Posting) SetLangTag(langTag []byte) *Posting {
 	p.langTag = p.builder.CreateByteVector(langTag)
 	return p
 }
 
-func (p *PostingBuilder) SetLabel(label string) *PostingBuilder {
+func (p *Posting) SetLabel(label string) *Posting {
 	p.label = p.builder.CreateString(label)
 	return p
 }
 
-func (p *PostingBuilder) AppendFacet() *postingFacetBuilder {
-	return newPostingFacetBuilder(p)
+func (p *Posting) AppendFacet() *postingFacet {
+	return newPostingFacet(p)
 }
 
-func (p *PostingBuilder) SetOp(op fb.DirectedEdgeOp) *PostingBuilder {
+func (p *Posting) SetOp(op fb.DirectedEdgeOp) *Posting {
 	p.op = op
 	return p
 }
 
-func (p *PostingBuilder) SetStartTs(startTs uint64) *PostingBuilder {
+func (p *Posting) SetStartTs(startTs uint64) *Posting {
 	p.startTs = startTs
 	return p
 }
 
-func (p *PostingBuilder) SetCommitTs(commitTs uint64) *PostingBuilder {
+func (p *Posting) SetCommitTs(commitTs uint64) *Posting {
 	p.commitTs = commitTs
 	return p
 }
 
-func (p *PostingBuilder) buildOffset() flatbuffers.UOffsetT {
+func (p *Posting) buildOffset() flatbuffers.UOffsetT {
 	fb.PostingStartFacetsVector(p.builder, len(p.facets))
 	for i := len(p.facets) - 1; i >= 0; i-- {
 		p.builder.PrependUOffsetT(p.facets[i])
@@ -89,7 +89,7 @@ func (p *PostingBuilder) buildOffset() flatbuffers.UOffsetT {
 	return fb.PostingEnd(p.builder)
 }
 
-func (p *PostingBuilder) Build() *fb.Posting {
+func (p *Posting) Build() *fb.Posting {
 	posting := p.buildOffset()
 	p.builder.Finish(posting)
 	buf := p.builder.FinishedBytes()

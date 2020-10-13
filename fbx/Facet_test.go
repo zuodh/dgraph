@@ -1,21 +1,21 @@
-package fbs_test
+package fbx_test
 
 import (
 	"testing"
 
 	"github.com/dgraph-io/dgraph/fb"
-	"github.com/dgraph-io/dgraph/fbs"
+	"github.com/dgraph-io/dgraph/fbx"
 	"github.com/stretchr/testify/require"
 )
 
-func TestFacetBuilder(t *testing.T) {
+func TestFacet(t *testing.T) {
 	key := "key"
 	value := []byte("value")
 	valueType := fb.FacetValueTypeBOOL
 	tokens := []string{"some", "tokens"}
 	alias := "alias"
 
-	facet := fbs.NewFacetBuilder().
+	facet := fbx.NewFacet().
 		SetKey(key).
 		SetValue(value).
 		SetValueType(valueType).
@@ -23,11 +23,11 @@ func TestFacetBuilder(t *testing.T) {
 		SetAlias(alias).
 		Build()
 
-	require.Equal(t, fbs.BytesToString(facet.Key()), key)
+	require.Equal(t, fbx.BytesToString(facet.Key()), key)
 	require.Equal(t, facet.ValueBytes(), value)
 	require.Equal(t, facet.TokensLength(), len(tokens))
 	for i, token := range tokens {
-		require.Equal(t, fbs.BytesToString(facet.Tokens(i)), token)
+		require.Equal(t, fbx.BytesToString(facet.Tokens(i)), token)
 	}
-	require.Equal(t, fbs.BytesToString(facet.Alias()), alias)
+	require.Equal(t, fbx.BytesToString(facet.Alias()), alias)
 }
