@@ -1,0 +1,67 @@
+namespace fb;
+
+enum FacetValueType : int32 {
+	STRING,
+	INT,
+	FLOAT,
+	BOOL,
+	DATETIME,
+}
+
+enum DirectedEdgeOp : int32 {
+    SET,
+    DEL,
+}
+
+enum PostingType : int32 {
+	REF,
+	VALUE,
+	VALUE_LANG,
+}
+
+enum PostingValueType : int32 {
+    DEFAULT,
+    BINARY,
+    INT,
+    FLOAT,
+    BOOL,
+    DATETIME,
+    GEO,
+    UID,
+    PASSWORD,
+    STRING,
+    OBJECT,
+}
+
+table Facet {
+	key:string;
+	value:[ubyte];
+	value_type:FacetValueType;
+	tokens:[string];
+	alias:string;
+}
+
+table DirectedEdge {
+    entity:uint64;
+	attr:string;
+	value:[ubyte];
+	value_type:PostingValueType;
+	value_id:uint64;
+	label:string;
+	lang:string;
+	op:DirectedEdgeOp;
+    facets:[Facet];
+	allowed_preds:[string];
+}
+
+table Posting {
+	uid:uint64;
+	value:[ubyte];
+	value_type:PostingValueType;
+	lang_tag:[ubyte];
+	label:string;
+	facets:[Facet];
+	op:DirectedEdgeOp;
+	start_ts:uint64;
+	commit_ts:uint64;
+}
