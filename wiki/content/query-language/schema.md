@@ -8,7 +8,7 @@ weight = 20
 
 For each predicate, the schema specifies the target's type.  If a predicate `p` has type `T`, then for all subject-predicate-object triples `s p o` the object `o` is of schema type `T`.
 
-* On mutations, scalar types are checked and an error thrown if the value cannot be converted to the schema type.
+* On mutations, scalar types are checked and an error is thrown if the value cannot be converted to the schema type.
 
 * On query, value results are returned according to the schema type of the predicate.
 
