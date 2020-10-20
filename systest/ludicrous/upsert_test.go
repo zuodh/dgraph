@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/dgraph-io/dgo/v200/protos/api"
 	"github.com/dgraph-io/dgraph/testutil"
@@ -73,6 +74,7 @@ func InitData(t *testing.T) {
 }
 
 func TestConcurrentUpdate(t *testing.T) {
+	time.Sleep(2 * time.Second)
 	InitData(t)
 	ctx := context.Background()
 	dg, err := testutil.DgraphClient(testutil.SockAddr)
@@ -120,6 +122,7 @@ func TestConcurrentUpdate(t *testing.T) {
 }
 
 func TestSequentialUpdate(t *testing.T) {
+	time.Sleep(2 * time.Second)
 	InitData(t)
 	ctx := context.Background()
 	dg, err := testutil.DgraphClient(testutil.SockAddr)
